@@ -4,6 +4,10 @@ import {
   FileArrowDown,
   TwitchLogo
 } from "phosphor-react";
+import {DefaultUi, Player, Youtube} from "@vime/react";
+import '@vime/core/themes/default.css'
+
+
 const GOKU_IMG = 'https://static-cdn.jtvnw.net/jtv_user_pictures/2a6ed95b-8734-4e03-9271-26dcce99599b-profile_image-70x70.jpg'
 export function Video () {
 
@@ -11,7 +15,13 @@ export function Video () {
     <div className="flex-1">
 
       <div className="bg-black flex justify-center">
-        <div className="h-full w-full max-w-[1100px] max-h-[60vh] aspect-video"></div>
+        <div className="h-full w-full max-w-[1100px] max-h-[60vh] aspect-video">
+          <Player>
+            <Youtube videoId="9JRBirZQ7us" />
+            <DefaultUi />
+
+          </Player>
+        </div>
       </div>
 
       <div className="p-8 max-w-[1080] mx-auto">
