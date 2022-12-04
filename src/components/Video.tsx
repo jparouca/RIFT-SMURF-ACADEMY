@@ -1,15 +1,60 @@
 import {
   CaretRight, Coffee,
   DiscordLogo,
-  FileArrowDown,
+  FileArrowDown, Spinner,
   TwitchLogo
 } from "phosphor-react";
 import {DefaultUi, Player, Youtube} from "@vime/react";
 import '@vime/core/themes/default.css'
+import {gql, useQuery} from "@apollo/client";
+import React from "react";
 
+interface VideoProps {
+  lessonSlug: string;
+}
 
-const GOKU_IMG = 'https://static-cdn.jtvnw.net/jtv_user_pictures/2a6ed95b-8734-4e03-9271-26dcce99599b-profile_image-70x70.jpg'
-export function Video () {
+interface GetLessonBySlugResponse {
+  lesson: {
+    title: string;
+    videoId: string;
+    description: string;
+    teacher: {
+      bio: string;
+      name: string;
+      avatarURL: string;
+    }
+  }
+}
+
+const GET_LESSON_BY_SLUG_QUERY = gql(`
+  query GetLessonBySlug($slug: String) {
+    lesson(where: {slug: $slug}) {
+      title
+      id
+      description
+      teacher {
+        bio
+        avatarURL
+        name
+      }
+    }
+  }
+`)
+
+export function Video (props: VideoProps) {
+  const {data} = useQuery<GetLessonBySlugResponse>(GET_LESSON_BY_SLUG_QUERY, {
+    variables: {
+      slug: props.lessonSlug
+    }
+  })
+
+  if (!data) {
+    return(
+      <div className="flex-1">
+        <Spinner />
+      </div>
+    )
+  }
 
   return (
     <div className="flex-1">
@@ -17,7 +62,7 @@ export function Video () {
       <div className="bg-black flex justify-center">
         <div className="h-full w-full max-w-[1100px] max-h-[60vh] aspect-video">
           <Player>
-            <Youtube videoId="9JRBirZQ7us" />
+            <Youtube videoId={data.lesson.videoId} />
             <DefaultUi />
 
           </Player>
@@ -28,14 +73,14 @@ export function Video () {
 
         <div className="flex items-start gap-16">
           <div className="flex-1">
-            <h1 className="text-2xl font-bold">Aula 00 - Configurações Importantes</h1>
-            <p className="mt-4 text-gray-200 leading-relaxed">Configuracoes importantes, setando os atalhos das skills, de camera, do campeao, loja video e outras.</p>
+            <h1 className="text-2xl font-bold">{data.lesson.title}</h1>
+            <p className="mt-4 text-gray-200 leading-relaxed">{data.lesson.description}</p>
 
             <div className="flex items-center gap-4 mt-6">
-              <img src={GOKU_IMG} alt=""/>
+              <img src={data.lesson.teacher.avatarURL} alt=""/>
               <div className="leading-relaxed">
-                <strong className="font-bold text-2xl block">Goku</strong>
-                <span className="text-gray-200 text-sm block">Streamer - CBLOL</span>
+                <strong className="font-bold text-2xl block">{data.lesson.teacher.name}</strong>
+                <span className="text-gray-200 text-sm block">{data.lesson.teacher.bio}</span>
               </div>
             </div>
           </div>
@@ -54,20 +99,20 @@ export function Video () {
         <div className="gap-8 mt-20 grid grid-cols-2">
               <a href="" className="bg-brown-700 hover:bg-brown-400 flex items-stretch gap-6 rounded transition-colors overflow-hidden">
                 <div className="bg-yellow-700 h-full p-6 flex items-center"><FileArrowDown size={40}/></div>
-                <div className="py-6 leding-relaxed">
+                <div className="py-6 leading-relaxed">
                   <strong className="text-2xl">Notes</strong>
                   <p className="text-sm text-gray-200 mt-2">Nota do professor, runas e itens.</p>
                 </div>
-                <div className="h-fulll p-6 flex items-center"><CaretRight size={24}/></div>
+                <div className="h-full p-6 flex items-center"><CaretRight size={24}/></div>
               </a>
 
               <a href="" className="bg-brown-700 hover:bg-brown-400 flex items-stretch gap-6 rounded transition-colors overflow-hidden">
                 <div className="bg-yellow-700 h-full p-6 flex items-center"><Coffee size={40}/></div>
                 <div className="py-6 leding-relaxed">
                   <strong className="text-2xl">Pague um café.</strong>
-                  <p className="text-sm text-gray-200 mt-2">Colabere com o professor a manter conteudos caso tenha gostado.</p>
+                  <p className="text-sm text-gray-200 mt-2">Colabore com o professor a manter conteudos caso tenha gostado.</p>
                 </div>
-                <div className="h-fulll p-6 flex items-center"><CaretRight size={24}/></div>
+                <div className="h-full p-6 flex items-center"><CaretRight size={24}/></div>
               </a>
         </div>
       </div>
