@@ -23,7 +23,7 @@ const GET_LESSONS_QUERY = gql(`
   }
 `)
 export function Sidebar () {
-  const {data} = useQuery(GET_LESSONS_QUERY)
+  const {data} = useQuery<GetLessonsQueryResponse>(GET_LESSONS_QUERY)
 
   console.log(data)
 
@@ -33,7 +33,16 @@ export function Sidebar () {
       <span className="font-bold text-2xl pb-6 mb-6 border-gray-500 block">Aulas</span>
 
       <div className="flex flex-col gap-8">
-        <Lesson title="Aula 00" slug="aula-01" type="class" availableAt={new Date()}/>
+        {data?.lessons.map(lesson => {
+          return (
+            <Lesson key={lesson.id}
+              title={lesson.title}
+              slug={lesson.slug}
+              type={lesson.lessonType}
+              availableAt={new Date(lesson.availableAt)}
+            />
+          )
+        })}
       </div>
 
     </aside>
